@@ -1,3 +1,33 @@
+# PersistentVolume (PV)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: flask-notes-db-pv
+spec:
+  capacity:
+    storage: 10Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data/flask-notes-db
+    type: DirectoryOrCreate
+
+---
+# PersistentVolumeClaim (PVC)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: flask-notes-db-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Mi
+  volumeMode: Filesystem
+
+---
+# Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,13 +53,20 @@ spec:
                 secretKeyRef:
                   name: flask-notes-secret
                   key: SECRET_KEY
-          livenessProbe: null
-          readinessProbe: null
+          volumeMounts:
+            - name: flask-notes-db
+              mountPath: /app/database
+      volumes:
+        - name: flask-notes-db
+          persistentVolumeClaim:
+            claimName: flask-notes-db-pvc
+
 ---
+# LoadBalancer service
 apiVersion: v1
 kind: Service
 metadata:
-  name: flask-notes-service 
+  name: flask-notes-service
 spec:
   selector:
     app: flask-notes-app
@@ -38,3 +75,4 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 5000
+
