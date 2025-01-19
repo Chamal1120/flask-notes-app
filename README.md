@@ -121,7 +121,7 @@ cd flask-notes-app
 kubectl create secret generic flask-notes-secret --from-literal=SECRET_KEY=<your_secure_key>
 ```
 
-[!TIP]
+> [!TIP]
 > You can use python to create a secure key
 > ```bash
 > python -c "import secrets; print(secrets.token_hex(32))"
