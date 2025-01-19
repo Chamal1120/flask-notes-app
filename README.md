@@ -6,7 +6,11 @@ GitHub Actions(CI/CD) Status: <br>
 
 ##
 
-### Table of Contents
+## Preview
+
+<image src="previews/preview1.webp"/>
+
+## Table of Contents
 
 - [Prerequisites](#prerequisites)
 - [Run locally](#Run-locally)
@@ -14,7 +18,7 @@ GitHub Actions(CI/CD) Status: <br>
 - [Test the k8s deployment Locally](#Test-the-k8s-deployment-locally)
 - [Troubleshooting](#troubleshooting)
 
-### Prerequisites
+## Prerequisites
 
 #### Common
 - [Git](https://git-scm.com/)
@@ -33,7 +37,7 @@ GitHub Actions(CI/CD) Status: <br>
 - [Minikube](https://minikube.sigs.k8s.io/docs/)
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 
-### Run and Develop locally
+## Run and Develop locally
 
 1. clone the repository to your local machine:
 
@@ -79,7 +83,7 @@ The following command will start a service that listens for changes in the main 
 npx tailwindcss -i ./src/input.css -o ./static/styles.css --watch
 ```
 
-### Run locally with docker
+## Run locally with docker
 
 1. clone the repository to your local machine (if you already haven't):
 
@@ -102,7 +106,7 @@ docker run -v $(pwd)/database:/app/database -p 5000:5000 flask-notes-app
 
 4. Now the app is accessible at `localhost:5000`.
 
-### Test the k8s deployment locally
+## Test the k8s deployment (locally)
 
 1. clone the repository to your local machine (if you already haven't):
 
@@ -111,12 +115,24 @@ git clone https://github.com/Chamal1120/flask-notes-app.git
 cd flask-notes-app
 ```
 
-2. Start Minikube If not running yet:
+2. Add a k8s secret for the flask app (Otherwise it will use the default one which dangerous in production).
+
+```bash
+kubectl create secret generic flask-notes-secret --from-literal=SECRET_KEY=<your_secure_key>
+```
+
+[!TIP]
+> You can use python to create a secure key
+> ```bash
+> python -c "import secrets; print(secrets.token_hex(32))"
+> ```
+
+3. Start Minikube If not running yet:
 ```bash
 minikube start
 ```
 
-3. Apply the deployment.yml file that contains the app's Kubernetes configuration:
+4. Apply the deployment.yml file that contains the app's Kubernetes configuration:
 
 ```bash
 kubectl apply -f deployment.yml
@@ -124,14 +140,14 @@ kubectl apply -f deployment.yml
 
 This will create a Deployment with 3 replicas and a LoadBalancer service for external access:
 
-4. Check if the pods and services are running correctly:
+5. Check if the pods and services are running correctly:
 
 ```bash
 kubectl get pods
 kubectl get svc flask-notes-service
 ```
 
-5. Open a seperate terminal window and start Minikube tunnel to expose the service to your local machine (you should keep this running until you finish working with the app):
+6. Open a seperate terminal window and start Minikube tunnel to expose the service to your local machine (you should keep this running until you finish working with the app):
 
 ```bash
 minikube tunnel
@@ -139,7 +155,7 @@ minikube tunnel
 
 This command will set up a network route from your machine to the Kubernetes cluster.
 
-6. Check the flask-notes-service again:
+7. Check the flask-notes-service again:
 
 ```bash
 kubectl get svc flask-notes-service
@@ -147,7 +163,7 @@ kubectl get svc flask-notes-service
 
 Now you'll see an external ip is available for the service.
 
-7. Open your browser and navigate to that external ip:
+8. Open your browser and navigate to that external ip:
 
 ```
 http://<external-ip>
@@ -155,21 +171,39 @@ http://<external-ip>
 
 You should now see the Flask Notes app running locally.
 
-### Troubleshooting
+## Summery Preview
 
-1. "Connection Refused" Error: If you're unable to access the app, ensure that Minikube is running, the tunnel is up, and the correct IP is being used. You can check the service by running:
+<image src="previews/preview2.webp"/>
+
+## Troubleshooting
+
+1. Minikube is failing to start: Try following two commands and restart your pc. Then try again.
+
+```bash
+minikube delete
+rm -rf ~/.minikube # Only for Unix-like systems
+```
+
+2. "Connection Refused" Error: If you're unable to access the app, ensure that Minikube is running, the tunnel is up, and the correct IP is being used. You can check the service by running:
 
 ```bash
 kubectl get svc flask-notes-service
 ```
 
-2. Pods Not Running: If your pods are not starting or are stuck in a crash loop, check the logs for errors:
+3. Pods Not Running: If your pods are not starting or are stuck in a crash loop, check the logs for errors:
 
 ```bash
 kubectl logs <pod-name>
 ```
 
-3. Minikube Tunnel Issues: If the tunnel is not working, try restarting Minikube:
+4. `db_path` not found issue in pod's logs: Try stoping and starting minikube again. Sometimes minikube fails to enable volume paritiioning plugins. 
+
+```bash
+minikube stop
+minikube start
+```
+
+5. Minikube Tunnel Issues: If the tunnel is not working, try restarting Minikube:
 
 ```bash
 minikube stop
