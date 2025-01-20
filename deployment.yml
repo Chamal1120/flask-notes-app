@@ -44,7 +44,7 @@ spec:
     spec:
       containers:
         - name: flask-notes-app
-          image: kenway213beep301/flask-notes-app:latest
+          image: kenway213beep301/flask-notes-app@sha256:13a3ee303cd703ed574d0538df9465004e91c0583e70d42d2c391d21c9e1d92d
           ports:
             - containerPort: 5000
           env:
